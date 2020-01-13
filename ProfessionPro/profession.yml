@@ -1,0 +1,22 @@
+miner:
+  name: 'Miner'
+  cangetexp: 'true'
+  maxlevel: '100'
+  level:
+    expperlevelmode: 'fix' #fix, limesfunction
+    expperlevel: '2000.0'
+    explimesfunction:
+      endexp: 10000.0
+      curvevalue: 0.03 #=endwert*(1-e^(kurvenwert*nächstesspielerlvl))
+  expmulti: '4.0'
+  moneymulti: '1.0'
+  behavior: `whitelist` #whitelist, blacklist
+  moneyendmulti: '2.0'
+  professionblock:
+    caninteractwith: 'false'
+    interactlist:
+    - FURNANCE
+  materiallist:
+    BREACKING:  #Breaking, Placing, Feeding, Crafting, Interacting, Killing, Smelting, Repairing, Brewing, Enchanting, Fishing
+    - WORLD;STONE;5.0;1.0 #WorldMaterial;Exp;Money
+    - ALL;STONE;5.0;1.0
