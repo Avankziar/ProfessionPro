@@ -1,0 +1,297 @@
+Bypass:
+  LogOther: 'eco.cmd.money.logother'
+  FilterLogOther: 'eco.cmd.money.filterlogother'
+  TrendDiagramOther: 'eco.cmd.money.trenddiagramother'
+  TrendGraficOther: 'eco.cmd.money.trendgraficother'
+  TrendLogOther: 'eco.cmd.money.trendlogother'
+  Recomment: 'eco.cmd.bypass.recomment'
+  StandingOrderCreate: 'eco.cmd.bypass.standingorder.create'
+  StandingOrderInfo: 'eco.cmd.bypass.standingorder.info'
+  StandingOrderDelete: 'eco.cmd.bypass.standingorder.delete'
+  StandingOrderPause: 'eco.cmd.bypass.standingorder.pause'
+  StandingOrderList: 'eco.cmd.bypass.standingorder.list'
+  DebtCreate: 'eco.cmd.bypass.debt.create'
+  DebtForgive: 'eco.cmd.bypass.debt.forgive'
+  DebtInfo: 'eco.cmd.bypass.debt.info'
+  DebtList: 'eco.cmd.bypass.debt.list'
+  DebtPause: 'eco.cmd.bypass.debt.pause'
+eco:
+  Name: 'econ'
+  Permission: 'eco.cmd.eco'
+  Suggestion: '/econ'
+  #Base and Info Command
+eco_deletelog:
+  Argument: 'deletelog'
+  Permission: 'eco.cmd.eco.deletelog'
+  Suggestion: '/eco deletelog <ID>'
+  #Delete the log with the <ID>
+eco_player:
+  Argument: 'player'
+  Permission: 'eco.cmd.eco.player'
+  Suggestion: '/eco player <Player>'
+  #Show the players balance uuid etc.
+eco_recomment:
+  Argument: 'recomment'
+  Permission: 'eco.cmd.eco.recomment'
+  Suggestion: '/eco recomment <ID> <Message>'
+  #Rewrite a log entry.
+eco_:
+  Argument: ''
+  Permission: 'eco.cmd.eco.'
+  Suggestion: '/eco '
+  #
+money:
+  Name: 'money'
+  Permission: 'eco.cmd.money'
+  Suggestion: '/money'
+  #Display your balance
+money_debt:
+  Argument: 'debt'
+  Permission: 'eco.cmd.money.debt'
+  Suggestion: '/money debt'
+  #Default Command
+money_debt_accept:
+  Argument: 'accept'
+  Permission: 'eco.cmd.money.debt.accept'
+  Suggestion: '/money debt accept [confirm]'
+  #Accept the debtproposal from the other player. #AFK, was anderes nachschauen
+money_debt_amount:
+  Argument: 'amount'
+  Permission: 'eco.cmd.money.debt.amount'
+  Suggestion: '/money debt amount <totalamount> <amountratio> <interest>'
+  #Set to a debt in workprogress the totalamount, amountratio and interest.
+money_debt_cancel:
+  Argument: 'cancel'
+  Permission: 'eco.cmd.money.debt.cancel'
+  Suggestion: '/money debt cancel'
+  #Cancel the debt in workprogress.
+money_debt_create:
+  Argument: 'create'
+  Permission: 'eco.cmd.money.debt.create'
+  Suggestion: '/money debt create <name> <from> <to>'
+  #Create a work in progress debtproposal
+money_debt_forgive:
+  Argument: 'forgive'
+  Permission: 'eco.cmd.money.debt.forgive'
+  Suggestion: '/money debt forgive <id> [confirm]'
+  #Forgive the restamount of the debt.
+money_debt_info:
+  Argument: 'info'
+  Permission: 'eco.cmd.money.debt.info'
+  Suggestion: '/money debt info [id]'
+  #Show all info to a debt. By no id, than is the work in progress debt
+money_debt_list:
+  Argument: 'list'
+  Permission: 'eco.cmd.money.debt.list'
+  Suggestion: '/money debt list [page]'
+  #Show a list of all debts of all the player
+money_debt_pause:
+  Argument: 'pause'
+  Permission: 'eco.cmd.money.debt.pause'
+  Suggestion: '/money debt pause <id>'
+  #Pause or unpause a debtrepayment
+money_debt_reject:
+  Argument: 'reject'
+  Permission: 'eco.cmd.money.debt.reject'
+  Suggestion: '/money debt reject'
+  #Reject a debt proposal
+money_debt_repay:
+  Argument: 'repay'
+  Permission: 'eco.cmd.money.debt.repay'
+  Suggestion: '/money debt repay <id> <amount>'
+  #Repay the amount to a debt.
+money_debt_send:
+  Argument: 'send'
+  Permission: 'eco.cmd.money.debt.send'
+  Suggestion: '/money debt send <player>'
+  #Send the player a debtproposal
+money_debt_time:
+  Argument: 'time'
+  Permission: 'eco.cmd.money.debt.time'
+  Suggestion: '/money debt time <starttime> <endtime> <repeatingtime>'
+  #Set the times. Starttime and Endtime in <dd.MM.yyyy-HH:mm> and RepeatingTime in <dd-HH:mm> format
+money_debts:
+  Argument: 'debts'
+  Permission: 'eco.cmd.money.debts'
+  Suggestion: '/money debts [page] [player]'
+  #Show Debts of the player
+money_filterlog:
+  Argument: 'filterlog'
+  Permission: 'eco.cmd.money.filterlog'
+  Suggestion: '/money filterlog'
+  #Default Cmd
+money_filterlog_between:
+  Argument: 'between'
+  Permission: 'eco.cmd.money.filterlogbetween'
+  Suggestion: '/money filterlog between <min> <max> [pageynumber] [player]'
+  #
+money_filterlog_comment:
+  Argument: 'comment'
+  Permission: 'eco.cmd.money.filterlogcomment'
+  Suggestion: '/money filterlog comment <searchword> [pageynumber] [player]'
+  #
+money_filterlog_commentasc:
+  Argument: 'commentascending'
+  Permission: 'eco.cmd.money.filterlogcommentascending'
+  Suggestion: '/money filterlog commentascending <searchword> [pageynumber] [player]'
+  #
+money_filterlog_commentdesc:
+  Argument: 'commentdescending'
+  Permission: 'eco.cmd.money.filterlogcommentdescending'
+  Suggestion: '/money filterlog commentdescending <searchword> [pageynumber] [player]'
+  #
+money_filterlog_from:
+  Argument: 'from'
+  Permission: 'eco.cmd.money.filterlogfrom'
+  Suggestion: '/money filterlog from <searchword> [pageynumber] [player]'
+  #
+money_filterlog_greaterthan:
+  Argument: 'greaterthan'
+  Permission: 'eco.cmd.money.filterloggreaterthan'
+  Suggestion: '/money filterlog greaterthan <value> [pageynumber] [player]'
+  #
+money_filterlog_lessthan:
+  Argument: 'lessthan'
+  Permission: 'eco.cmd.money.filterloglessthan'
+  Suggestion: '/money filterlog lessthan <value> [pageynumber] [player]'
+  #
+money_filterlog_orderer:
+  Argument: 'orderer'
+  Permission: 'eco.cmd.money.filterlogorderer'
+  Suggestion: '/money filterlog orderer <searchword> [pageynumber] [player]'
+  #
+money_filterlog_sortasc:
+  Argument: 'sortascending'
+  Permission: 'eco.cmd.money.filterlogsortascending'
+  Suggestion: '/money filterlog sortascending [pageynumber] [player]'
+  #
+money_filterlog_sortdesc:
+  Argument: 'sortdescending'
+  Permission: 'eco.cmd.money.filterlogsortdescending'
+  Suggestion: '/money filterlog sortdescending [pageynumber] [player]'
+  #
+money_filterlog_to:
+  Argument: 'to'
+  Permission: 'eco.cmd.money.filterlogto'
+  Suggestion: '/money filterlog to <searchword> [pageynumber] [player]'
+  #Filter the log after the to-Payer
+money_freeze:
+  Argument: 'freeze'
+  Permission: 'eco.cmd.money.freeze'
+  Suggestion: '/money freeze <player>'
+  #Freeze the playeraccount
+money_give:
+  Argument: 'give'
+  Permission: 'eco.cmd.money.give'
+  Suggestion: '/money give <player> <value> [note]'
+  #Give the player from the void money
+money_log:
+  Argument: 'log'
+  Permission: 'eco.cmd.money.log'
+  Suggestion: '/money log [pagenumber] [player]'
+  #Show the logs of all payments
+money_pay:
+  Argument: 'pay'
+  Permission: 'eco.cmd.money.pay'
+  Suggestion: '/money pay <player> <value> [note]'
+  #Player to player paying
+money_standingorder:
+  Argument: 'standingorder'
+  Permission: 'eco.cmd.money.standingorder'
+  Suggestion: '/money standingorder'
+  #Default cmd
+money_standingorder_amount:
+  Argument: 'amount'
+  Permission: 'eco.cmd.money.standingorder.amount'
+  Suggestion: '/money standingorder amount <amount>'
+  #Set to a waiting standingorder the amount
+money_standingorder_cancel:
+  Argument: 'cancel'
+  Permission: 'eco.cmd.money.standingorder.cancel'
+  Suggestion: '/money standingorder cancel'
+  #Cancel the waiting standing order.
+money_standingorder_create:
+  Argument: 'create'
+  Permission: 'eco.cmd.money.standingorder.create'
+  Suggestion: '/money standingorder create <name> <From> <To>'
+  #Create a Standingorder. Additional Settings must be set.
+money_standingorder_delete:
+  Argument: 'delete'
+  Permission: 'eco.cmd.money.standingorder.delete'
+  Suggestion: '/money standingorder delete <ID>'
+  #Delete the standing order.
+money_standingorder_info:
+  Argument: 'info'
+  Permission: 'eco.cmd.money.standingorder.info'
+  Suggestion: '/money standingorder info [id]'
+  #Show Infos about standingorder.
+money_standingorder_list:
+  Argument: 'list'
+  Permission: 'eco.cmd.money.standingorder.list'
+  Suggestion: '/money standingorder list [pager] [player]'
+  #Show a list of all standingorders from the player.
+money_standingorder_pause:
+  Argument: 'pause'
+  Permission: 'eco.cmd.money.standingorder.pause'
+  Suggestion: '/money standingorder pause <ID>'
+  #Paused a standingorder or cancelled the cancelstatus.
+money_standingorder_repeatingtime:
+  Argument: 'repeatingtime'
+  Permission: 'eco.cmd.money.standingorder.repeatingtime'
+  Suggestion: '/money standingorder repeatingtime <dd-HH:mm Value>'
+  #Set the repeating time of the waiting standing order. Must use the specific >dd-HH:mm< Pattern. For example 01-23:50 for 1 day, 23 hours and 50 seconds
+money_standingorder_starttime:
+  Argument: 'starttime'
+  Permission: 'eco.cmd.money.standingorder.starttime'
+  Suggestion: '/money standingorder starttime <dd.MM.yyyy-HH:mm Value>'
+  #Set the starttime in <dd.MM.yyyy-HH:mm> format.
+money_take:
+  Argument: 'take'
+  Permission: 'eco.cmd.money.take'
+  Suggestion: '/money take <player> <value> [note]'
+  #Take the money from a player in the void
+money_toggle:
+  Argument: 'toggle'
+  Permission: 'eco.cmd.money.toggle'
+  Suggestion: '/money toggle'
+  #Toggle to see money payment messages
+money_top:
+  Argument: 'top'
+  Permission: 'eco.cmd.money.top'
+  Suggestion: '/money top [pagenumber]'
+  #Show the top balance players
+money_trend:
+  Argument: 'trend'
+  Permission: 'eco.cmd.money.trend'
+  Suggestion: '/money trend'
+  #Default cmd
+money_trend_diagram:
+  Argument: 'trenddiagram'
+  Permission: 'eco.cmd.money.trenddiagram'
+  Suggestion: '/money trend diagram [pagenumber] [player]'
+  #
+money_trend_grafic:
+  Argument: 'trendgrafic'
+  Permission: 'eco.cmd.money.trendgrafic'
+  Suggestion: '/money trend grafic [pagenumber] [player]'
+  #
+money_trend_log:
+  Argument: 'trendlog'
+  Permission: 'eco.cmd.money.trendlog'
+  Suggestion: '/money trend log [pagenumber] [player]'
+  #
+money_:
+  Argument: ''
+  Permission: 'eco.cmd.money.'
+  Suggestion: '/money '
+  #
+bank:
+  Name: 'bank'
+  Permission: 'eco.cmd.bank'
+  Suggestion: '/bank'
+  #
+bank_:
+  Argument: ''
+  Permission: 'eco.cmd.money.'
+  Suggestion: '/money '
+  #

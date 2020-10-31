@@ -1,47 +1,42 @@
-package main.java.de.avankziar.professionpro.interfaces;
+package main.java.de.avankziar.professionpro.objectsprofession;
 
-import java.util.ArrayList;
+import java.util.LinkedHashMap;
 
 import org.bukkit.Material;
 
-import main.java.de.avankziar.professionpro.enums.Behavior;
+import main.java.de.avankziar.professionpro.enums.Activity;
 import main.java.de.avankziar.professionpro.enums.ExpPerLevelMode;
 
-public class Profession 
+public class GeneralProfession 
 {
-	private String name;
-	private int maxlevel;
-	private boolean cangetexp;
-	private ExpPerLevelMode expperlevelmode;
-	private double expperlevel;
-	private double endvalue;
-	private double curvevalue;
-	private Behavior behavior;
-	private double expmulti;
-	private double moneymulti;
-	private double moneyendmulti;
-	private ArrayList<ActivityList> activitylist;
-	private boolean caninteractwithblocks;
-	private ArrayList<Material> professionblocks;
+	private int id; //Unique identifier
+	private String name; //Name of Profession
+	private String permission; //Perm to aquired this job.
+	private int maxLevel;
+	private LinkedHashMap<Integer, Level> levels; //All Levels
+	private boolean canGetExp; //CanGetExp
+	private ExpPerLevelMode expPerLevelMode; //Fix or Limes
+	private double expEndMulti; //Differenc from Lvl 1 to EndLevel for a ExpMulti. At lvl 1 is the Multi always '1.0'
+	private double moneyEndMulti; //Differenc from Lvl 1 to EndLevel for a MoneyMulti. At lvl 1 is the Multi always '1.0'
+	private LinkedHashMap<Activity, LinkedHashMap<KeyObject, ExchangeObject>> exchangePerActivity; //Per Activity, Money and Exp per Material and Entity
+	private LinkedHashMap<Material, Boolean> professionInteractions; //All Blocks the player can be interact or not.
 	
-	public Profession(String name, int maxlevel, boolean cangetexp, ExpPerLevelMode expperlevelmode, double expperlevel,
-			double endvalue, double curvevalue, Behavior behavior, double expmulti, double moneymulti, double moneyendmulti,
-			ArrayList<ActivityList> activitylist, boolean caninteractwithblocks, ArrayList<Material> professionblocks)
+	public GeneralProfession(int id, String name, String permission, int maxLevel, LinkedHashMap<Integer, Level> levels,
+			boolean canGetExp, ExpPerLevelMode expPerLevelMode, double expEndMulti, double moneyEndMulti,
+			LinkedHashMap<Activity, LinkedHashMap<KeyObject, ExchangeObject>> exchangePerActivity, 
+			LinkedHashMap<Material, Boolean> professionInteractions)
 	{
+		setId(id);
 		setName(name);
-		setMaxlevel(maxlevel);
-		setCangetexp(cangetexp);
-		setExpperlevelmode(expperlevelmode);
-		setExpperlevel(expperlevel);
-		setEndvalue(endvalue);
-		setCurvevalue(curvevalue);
-		setBehavior(behavior);
-		setExpmulti(expmulti);
-		setMoneymulti(moneymulti);
-		setMoneyendmulti(moneyendmulti);
-		setActivitylist(activitylist);
-		setCaninteractwithblocks(caninteractwithblocks);
-		setProfessionblocks(professionblocks);
+		setPermission(permission);
+		setMaxLevel(maxLevel);
+		setLevels(levels);
+		setCanGetExp(canGetExp);
+		setExpPerLevelMode(expPerLevelMode);
+		setExpEndMulti(expEndMulti);
+		setMoneyEndMulti(moneyEndMulti);
+		setExchangePerActivity(exchangePerActivity);
+		setProfessionInteractions(professionInteractions);
 	}
 
 	public String getName() {
@@ -52,107 +47,95 @@ public class Profession
 		this.name = name;
 	}
 	
-	public int getMaxlevel() {
-		return maxlevel;
+	public int getMaxLevel() {
+		return maxLevel;
 	}
 
-	public void setMaxlevel(int maxlevel) {
-		this.maxlevel = maxlevel;
+	public void setMaxLevel(int maxLevel) {
+		this.maxLevel = maxLevel;
 	}
 
-	public boolean isCangetexp() {
-		return cangetexp;
+	public String getPermission()
+	{
+		return permission;
 	}
 
-	public void setCangetexp(boolean cangetexp) {
-		this.cangetexp = cangetexp;
+	public void setPermission(String permission)
+	{
+		this.permission = permission;
 	}
 
-	public ExpPerLevelMode getExpperlevelmode() {
-		return expperlevelmode;
+	public boolean isCanGetExp() {
+		return canGetExp;
 	}
 
-	public void setExpperlevelmode(ExpPerLevelMode expperlevelmode) {
-		this.expperlevelmode = expperlevelmode;
+	public void setCanGetExp(boolean canGetExp) {
+		this.canGetExp = canGetExp;
 	}
 
-	public double getExpperlevel() {
-		return expperlevel;
+	public ExpPerLevelMode getExpPerLevelMode() {
+		return expPerLevelMode;
 	}
 
-	public void setExpperlevel(double expperlevel) {
-		this.expperlevel = expperlevel;
+	public void setExpPerLevelMode(ExpPerLevelMode expPerLevelMode) {
+		this.expPerLevelMode = expPerLevelMode;
 	}
 
-	public double getEndvalue() {
-		return endvalue;
+	public double getMoneyEndMulti() {
+		return moneyEndMulti;
 	}
 
-	public void setEndvalue(double endvalue) {
-		this.endvalue = endvalue;
+	public void setMoneyEndMulti(double moneyEndMulti) {
+		this.moneyEndMulti = moneyEndMulti;
 	}
 
-	public double getCurvevalue() {
-		return curvevalue;
+	public double getExpEndMulti()
+	{
+		return expEndMulti;
 	}
 
-	public void setCurvevalue(double curvevalue) {
-		this.curvevalue = curvevalue;
+	public void setExpEndMulti(double expEndMulti)
+	{
+		this.expEndMulti = expEndMulti;
 	}
 
-	public Behavior getBehavior() {
-		return behavior;
+	public LinkedHashMap<Material, Boolean> getProfessionInteractions()
+	{
+		return professionInteractions;
 	}
 
-	public void setBehavior(Behavior behavior) {
-		this.behavior = behavior;
+	public void setProfessionInteractions(LinkedHashMap<Material, Boolean> professionInteractions)
+	{
+		this.professionInteractions = professionInteractions;
 	}
 
-	public double getExpmulti() {
-		return expmulti;
+	public  LinkedHashMap<Activity, LinkedHashMap<KeyObject, ExchangeObject>> getExchangePerActivity()
+	{
+		return exchangePerActivity;
 	}
 
-	public void setExpmulti(double expmulti) {
-		this.expmulti = expmulti;
+	public void setExchangePerActivity(LinkedHashMap<Activity, LinkedHashMap<KeyObject, ExchangeObject>> exchangePerActivity)
+	{
+		this.exchangePerActivity = exchangePerActivity;
 	}
 
-	public double getMoneymulti() {
-		return moneymulti;
+	public LinkedHashMap<Integer, Level> getLevels()
+	{
+		return levels;
 	}
 
-	public void setMoneymulti(double moneymulti) {
-		this.moneymulti = moneymulti;
+	public void setLevels(LinkedHashMap<Integer, Level> levels)
+	{
+		this.levels = levels;
 	}
 
-	public double getMoneyendmulti() {
-		return moneyendmulti;
+	public int getId()
+	{
+		return id;
 	}
 
-	public void setMoneyendmulti(double moneyendmulti) {
-		this.moneyendmulti = moneyendmulti;
-	}
-
-	public ArrayList<ActivityList> getActivitylist() {
-		return activitylist;
-	}
-
-	public void setActivitylist(ArrayList<ActivityList> activitylist) {
-		this.activitylist = activitylist;
-	}
-
-	public boolean isCaninteractwithblocks() {
-		return caninteractwithblocks;
-	}
-
-	public void setCaninteractwithblocks(boolean caninteractwithblocks) {
-		this.caninteractwithblocks = caninteractwithblocks;
-	}
-
-	public ArrayList<Material> getProfessionblocks() {
-		return professionblocks;
-	}
-
-	public void setProfessionblocks(ArrayList<Material> professionblocks) {
-		this.professionblocks = professionblocks;
+	public void setId(int id)
+	{
+		this.id = id;
 	}
 }

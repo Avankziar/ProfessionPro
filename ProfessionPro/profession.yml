@@ -1,22 +1,32 @@
-miner:
-  name: 'Miner'
-  cangetexp: 'true'
-  maxlevel: '100'
-  level:
-    expperlevelmode: 'fix' #fix, limesfunction
-    expperlevel: '2000.0'
-    explimesfunction:
-      endexp: 10000.0
-      curvevalue: 0.03 #=endwert*(1-e^(kurvenwert*nächstesspielerlvl))
-  expmulti: '4.0'
-  moneymulti: '1.0'
-  behavior: `whitelist` #whitelist, blacklist
-  moneyendmulti: '2.0'
-  professionblock:
-    caninteractwith: 'false'
-    interactlist:
-    - FURNANCE
-  materiallist:
-    BREACKING:  #Breaking, Placing, Feeding, Crafting, Interacting, Killing, Smelting, Repairing, Brewing, Enchanting, Fishing
-    - WORLD;STONE;5.0;1.0 #WorldMaterial;Exp;Money
-    - ALL;STONE;5.0;1.0
+#ATTENTION! Please set all Profession once and for all! You may adding a Profession, but if you change the LevelsValues etc., it may change intern everything!
+Miner:
+  Id: 1 #Once set, do NOT change the number! And set always a other number by multiple professions!!!!
+  Name: 'Miner'
+  Permission: 'permission.permission'
+  CanGetExp: true
+  MaxLevel: 100 #Startlevel is always 1!
+  Level:
+    ExpPerLevelMode: 'FIX' #FIX, EXPONENTIAL, LIMESFUNCTION, PROPORTIONALGRADIENT, STAIRSSLOPE
+    Fix: #You only need the part, which you actual use ^^
+      ExpPerLevel: 2000.0
+    Exponential: #ExpPerLevel = BaseValue^NextLevel
+      BaseValue: 1.25
+    LimesFunction: #ExpPerLevel = EndExp - EndExp*(1-e^(CurveValue*NextLevel))
+      EndExp: 10000.0
+      CurveValue: 0.03
+    ProportionalGradient: #ExpPerLevel = NextLevel*ExpValue
+      ExpValue: 1000.0
+    StairsSlope: #ExpPerLevel = Math.floorDiv(NextLevel, amountPausedLevel)*expIncreaseValue+BeginValue | Every x levels, the Exp increases by the increase value
+      BeginValue: 100.0
+      ExpIncreaseValue: 1000.0
+      AmountPausedLevel: 5
+  ExpMulti: 1.0 #General exp Multi for the complet profession
+  ExpEndMulti: 2.0 #At Endlevel, user become 2x exp as a lvl 1 player
+  MoneyMulti: 1.0 #General money Multi for the complet profession
+  MoneyEndMulti: 2.0 #At Endlevel, user becoe 2x money as a lvl 1 player
+  ProfessionBlock:
+  - FURNANCE;false #If false, you cannot interact with this blocks. If you declare true, it overrite every false statment.
+  ActivityAndExchange:
+    BREACKING:  #For a complet List and information see plugin spigot website.
+    - STONE;UNKNOW;5.0;1.0 #Material;EntityType;Exp;Money | Is Material or Entity not Important, set to AIR or UNKNOW
+    - DIAMOND;UNKNOW;5.0;1.0

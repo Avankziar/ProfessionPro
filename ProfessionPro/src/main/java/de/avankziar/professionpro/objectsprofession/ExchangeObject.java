@@ -1,26 +1,14 @@
-package main.java.de.avankziar.professionpro.interfaces;
+package main.java.de.avankziar.professionpro.objectsprofession;
 
-import org.bukkit.Material;
-
-public class MaterialList 
+public class ExchangeObject 
 {
-	private Material material;
 	private double exp;
 	private double money;
 	
-	public MaterialList(Material material, double exp, double money)
+	public ExchangeObject(double exp, double money)
 	{
-		setMaterial(material);
 		setExp(exp);
 		setMoney(money);
-	}
-
-	public Material getMaterial() {
-		return material;
-	}
-
-	public void setMaterial(Material material) {
-		this.material = material;
 	}
 
 	public double getExp() {

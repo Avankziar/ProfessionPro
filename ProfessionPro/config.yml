@@ -1,4 +1,5 @@
 language: 'english'
+Bungee: true
 mysql:
   status: 'false'
   host: '127.0.0.1'
@@ -10,6 +11,18 @@ mysql:
   user: 'admin'
   password: 'not_0123456789'
   tableNameI: 'plugintablename'
-general:
-  professions:
-  - miner
+Player:
+  UpdateJoiningPlayersProfession: false #If you have make changes to already existing Jobs, set this on true for a Time x.
+  MaximalProfessionAtOneTime: 2
+  MaximalUtilityBlocksAtOneTime: 20
+  MinimalTimeBeforProfessionSwitch: 84600000 #In Milliseconds, default is a day
+  LooseExpBySwitchingProfession: true
+  ExpSwitchLooseType: 'FIX' #FIX, PERCENTAGE
+  ExpLoose:
+    Fix: 1000.0
+    Percantage: 0.1
+  DistributeMoneySchedulerTimer: 30 #In Seconds.
+  DistributeExpSchedulerTimer: 10 #In Seconds.
+General:
+  Professions: #A List of all keywords for the professions.yml file
+  - Miner

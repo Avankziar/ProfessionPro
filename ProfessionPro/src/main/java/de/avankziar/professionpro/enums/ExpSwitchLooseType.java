@@ -1,6 +1,6 @@
 package main.java.de.avankziar.professionpro.enums;
 
-public enum Behavior 
+public enum ExpSwitchLooseType
 {
-	WHITELIST, BLACKLIST, NORMAL;
+	FIX, PERCENTAGE;
 }
