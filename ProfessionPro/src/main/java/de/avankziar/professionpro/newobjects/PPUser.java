@@ -5,10 +5,14 @@ import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 import java.util.UUID;
 
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.OfflinePlayer;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
+import main.java.de.avankziar.professionpro.enums.Activity;
 import main.java.de.avankziar.professionpro.newobjects.enums.EnhancementType;
 import main.java.de.avankziar.professionpro.newobjects.enums.ListType;
 
@@ -32,6 +36,13 @@ public class PPUser
 	private LinkedHashMap<String, UserProfession> userInactiveProfessions = new LinkedHashMap<>();
 	//All registiert location from useable Blocks
 	private LinkedHashMap<Material, ArrayList<ServerLocation>> useableBlocks = new LinkedHashMap<>();
+	//Set RAM craftableItem to speedup the system
+	private LinkedHashMap<String, Boolean> craftableItemsBooleanRAM = new LinkedHashMap<>();
+	//Set RAM interactable to speedup the system, String = "Material;EntityType"
+	private LinkedHashMap<String, Boolean> interactableBooleanRAM = new LinkedHashMap<>();
+	//Per Activity a Material and/or EntityType and the payment to that.
+	//List everything, what the player has done in the last x-Time
+	private LinkedHashMap<Activity, LinkedHashMap<TargetKey, ArrayList<Payment>>> paymentPlanRAM = new LinkedHashMap<>();
 	
 	//All existing player from mysql
 	private static LinkedHashMap<UUID, PPUser> allUser = new LinkedHashMap<>();
@@ -43,9 +54,11 @@ public class PPUser
 	//Maximum Number to evaluate the number for the user upgrade- and fusionamount, by counting down
 	private static Integer internMaximumNumberForUserMaximumProfessionUpgradeAndFusionAmountPermission;
 	
-	public PPUser()
+	public PPUser(){}
+	
+	public PPUser(String userUUID, String userName)
 	{
-		// TODO Auto-generated constructor stub
+		
 	}
 	
 	public UUID getUserUUID()
@@ -66,6 +79,16 @@ public class PPUser
 	public void setUserName(String userName)
 	{
 		this.userName = userName;
+	}
+	
+	public Player getPlayer()
+	{
+		return (userUUID != null) ? Bukkit.getPlayer(userUUID) : null;
+	}
+	
+	public OfflinePlayer getOfflinePlayer()
+	{
+		return (userUUID != null) ? Bukkit.getOfflinePlayer(userUUID) : null;
 	}
 
 	public double getMadeMoney()
@@ -395,6 +418,15 @@ public class PPUser
 	
 	public boolean isItemCraftable(ItemStack itemStack)
 	{
+		if(!craftableItemsBooleanRAM.isEmpty())
+		{
+			Boolean boo = craftableItemsBooleanRAM.get(
+					(itemStack.getItemMeta() != null && itemStack.getItemMeta().hasDisplayName()) ? itemStack.getItemMeta().getDisplayName() : itemStack.getType().toString());
+			if(boo != null)
+			{
+				return boo;
+			}
+		}
 		for(String referenceName : userActiveProfessions.keySet())
 		{
 			if(!Profession.getAllProfessions().containsKey(referenceName))
@@ -403,29 +435,152 @@ public class PPUser
 			}
 			Profession profession = Profession.getAllProfessions().get(referenceName);
 			int actualLevel = userActiveProfessions.get(referenceName).getActualProfessionLevel().getLevel(); 
-			for(Entry<Integer, ArrayList<ItemStack>> sets : profession.getListedItems().entrySet())
+			
+			CraftableItem craftableItem = profession.getCraftableItems().get(
+					(itemStack.getItemMeta() != null && itemStack.getItemMeta().hasDisplayName()) ? itemStack.getItemMeta().getDisplayName() : itemStack.getType().toString());
+			if(craftableItem != null)
 			{
-				ItemStack[] array = new ItemStack[sets.getValue().size()];
-				sets.getValue().toArray(array);
-				if(Cost.isSimilar(itemStack, array))
+				if(Cost.isSimilar(itemStack, craftableItem.getItemStack()))
 				{
 					if(profession.getCraftableType() == ListType.WHITELIST)
 					{
-						if(sets.getKey() >= actualLevel)
+						if(profession.isCraftableTypeLinkedWithLevels())
 						{
-							return false;
+							if(actualLevel >= craftableItem.getLevel())
+							{
+								settingCraftableItemsRAM(itemStack, true);
+								return true;
+							} else
+							{
+								settingCraftableItemsRAM(itemStack, false);
+								return false;
+							}
+						} else
+						{
+							settingCraftableItemsRAM(itemStack, true);
+							return true;
 						}
 					} else
 					{
-						if(sets.getKey() < actualLevel)
+						if(profession.isCraftableTypeLinkedWithLevels())
 						{
+							if(actualLevel < craftableItem.getLevel())
+							{
+								settingCraftableItemsRAM(itemStack, true);
+								return true;
+							} else
+							{
+								settingCraftableItemsRAM(itemStack, false);
+								return false;
+							}
+						} else
+						{
+							settingCraftableItemsRAM(itemStack, false);
 							return false;
 						}
 					}
 				}
 			}
 		}
-		return true;
+		if(Profession.getGeneralCraftableType() == ListType.WHITELIST)
+		{
+			return false;
+		} else
+		{
+			return true;
+		}
+	}
+	
+	private void settingCraftableItemsRAM(ItemStack itemStack, boolean boo)
+	{
+		if(!craftableItemsBooleanRAM.containsKey(
+		(itemStack.getItemMeta() != null && itemStack.getItemMeta().hasDisplayName())
+		? itemStack.getItemMeta().getDisplayName() : itemStack.getType().toString()))
+		{
+			craftableItemsBooleanRAM.put(
+			(itemStack.getItemMeta() != null && itemStack.getItemMeta().hasDisplayName())
+			? itemStack.getItemMeta().getDisplayName() : itemStack.getType().toString(), boo);
+		}
+	}
+	
+	public boolean isInteractable(Material material, EntityType entityType)
+	{
+		if(!interactableBooleanRAM.isEmpty())
+		{
+			Boolean boo = interactableBooleanRAM.get(material.toString()+";"+entityType.toString());
+			if(boo != null)
+			{
+				return boo;
+			}
+		}
+		for(String referenceName : userActiveProfessions.keySet())
+		{
+			if(!Profession.getAllProfessions().containsKey(referenceName))
+			{
+				continue;
+			}
+			Profession profession = Profession.getAllProfessions().get(referenceName);
+			int actualLevel = userActiveProfessions.get(referenceName).getActualProfessionLevel().getLevel(); 
+			for(Entry<TargetKey, Integer> sets : profession.getPossibleInteraction().entrySet())
+			{
+				if(sets.getKey().getMaterial() == material
+						&& sets.getKey().getEntityType() == entityType)
+				{
+					if(profession.getCraftableType() == ListType.WHITELIST)
+					{
+						if(profession.isInteractableTypeLinkedWithLevels())
+						{
+							if(actualLevel >= sets.getValue())
+							{
+								settingInteractableRAM(material, entityType, true);
+								return true;
+							} else
+							{
+								settingInteractableRAM(material, entityType, false);
+								return false;
+							}
+						} else
+						{
+							settingInteractableRAM(material, entityType, true);
+							return true;
+						}
+					} else
+					{
+						if(profession.isInteractableTypeLinkedWithLevels())
+						{
+							if(actualLevel < sets.getValue())
+							{
+								settingInteractableRAM(material, entityType, true);
+								return true;
+							} else
+							{
+								settingInteractableRAM(material, entityType, false);
+								return false;
+							}
+						} else
+						{
+							settingInteractableRAM(material, entityType, false);
+							return false;
+						}
+					}
+				}
+			}
+		}
+		if(Profession.getGeneralInteractType() == ListType.WHITELIST)
+		{
+			return false;
+		} else
+		{
+			return true;
+		}
+	}
+	
+	private void settingInteractableRAM(Material material, EntityType entityType, boolean boo)
+	{
+		if(!interactableBooleanRAM.containsKey(material.toString()+";"+entityType.toString()))
+		{
+			interactableBooleanRAM.put(material.toString()+";"+entityType.toString(), boo);
+		}
 	}
 	
 	//TODO
@@ -455,13 +610,83 @@ public class PPUser
 		ArrayList<ServerLocation> materialList = new ArrayList<>();
 		if(useableBlocks.containsKey(material))
 		{
-			
+			materialList = useableBlocks.get(material);
+			materialList.add(location);
+			useableBlocks.replace(material, materialList);
 		} else
 		{
 			materialList.add(location);
+			useableBlocks.put(material, materialList);
 		}
-		//Block is registert
+		//Block is registered
 		return 1;
+	}
+
+	public LinkedHashMap<String, Boolean> getCraftableItemsBooleanRAM()
+	{
+		return craftableItemsBooleanRAM;
+	}
+	
+	public LinkedHashMap<String, Boolean> getInteractableBooleanRAM()
+	{
+		return interactableBooleanRAM;
+	}
+	
+	
+	//TODO The real thing
+	public void activeDoing(Activity activity, Material material, EntityType entityType)
+	{
+		if(!paymentPlanRAM.isEmpty())
+		{
+			LinkedHashMap<TargetKey,ArrayList<Payment>> paymentPlans = paymentPlanRAM.get(activity);
+			if(paymentPlans != null)
+			{
+				ArrayList<Payment> payments = paymentPlans.get(new TargetKey(material, entityType));
+				if(payments != null)
+				{
+					//TODO hier die dinge money, exp etc. dem spieler geben
+					return;
+				}
+			}
+		}
+		for(UserProfession userProfession : userActiveProfessions.values())
+		{
+			Profession profession = Profession.getAllProfessions().get(userProfession.getReferenceName());
+			if(profession == null)
+			{
+				continue;
+			}
+			Payment payment = profession.getPaymentPlan().get(activity).get(new TargetKey(material, entityType));
+			if(payment != null)
+			{
+				if(paymentPlanRAM.containsKey(activity))
+				{
+					LinkedHashMap<TargetKey, ArrayList<Payment>> paymentPlans = paymentPlanRAM.get(activity);
+					if(paymentPlans.containsKey(new TargetKey(material, entityType)))
+					{
+						//TODO
+					} else
+					{
+						ArrayList<Payment> list = new ArrayList<>();
+						list.add(payment);
+						paymentPlans.put(new TargetKey(material, entityType), list);
+						paymentPlanRAM.replace(activity, paymentPlans);
+					}
+				} else
+				{
+					LinkedHashMap<TargetKey, Payment> pays = new LinkedHashMap<>();
+					pays.put(new TargetKey(material, entityType), payment);
+				}
+			}
+		}
+	}
+
+	//Call everytime userprofession is level up, to reset RAM values, (from time to time the whitelist values change)
+	public void levelUp()
+	{
+		craftableItemsBooleanRAM = new LinkedHashMap<>();
+		interactableBooleanRAM = new LinkedHashMap<>();
+		paymentPlanRAM = new LinkedHashMap<>();
 	}
 
 	public void addUser()

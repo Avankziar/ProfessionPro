@@ -30,17 +30,17 @@ public class MysqlHandler implements TableI, TableII//, //TableIII, //TableIV, T
 	
 	public boolean loadMysqlHandler()
 	{
-		tableNameI = plugin.getYamlHandler().get().getString("Mysql.TableNameI");
+		tableNameI = plugin.getYamlHandler().getConfig().getString("Mysql.TableNameI");
 		if(tableNameI == null)
 		{
 			return false;
 		}
-		tableNameII = plugin.getYamlHandler().get().getString("Mysql.TableNameII");
+		tableNameII = plugin.getYamlHandler().getConfig().getString("Mysql.TableNameII");
 		if(tableNameII == null)
 		{
 			return false;
 		}
-		tableNameIII = plugin.getYamlHandler().get().getString("Mysql.TableNameIII");
+		tableNameIII = plugin.getYamlHandler().getConfig().getString("Mysql.TableNameIII");
 		if(tableNameIII == null)
 		{
 			return false;

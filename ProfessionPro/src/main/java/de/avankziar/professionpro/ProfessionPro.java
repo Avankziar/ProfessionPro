@@ -32,15 +32,18 @@ import main.java.de.avankziar.professionpro.commands.tree.CommandConstructor;
 import main.java.de.avankziar.professionpro.database.MysqlHandler;
 import main.java.de.avankziar.professionpro.database.MysqlSetup;
 import main.java.de.avankziar.professionpro.database.YamlHandler;
+import main.java.de.avankziar.professionpro.database.YamlManager;
 import main.java.de.avankziar.professionpro.metrics.Metrics;
 import main.java.de.avankziar.professionpro.newobjects.JarLoader;
 import net.milkbowl.vault.economy.Economy;
+import net.milkbowl.vault.permission.Permission;
 
 public class ProfessionPro  extends JavaPlugin
 {
 	public static Logger log;
 	public String pluginName = "ProfessionPro";
 	private static YamlHandler yamlHandler;
+	private static YamlManager yamlManager;
 	private static MysqlSetup mysqlSetup;
 	private static MysqlHandler mysqlHandler;
 	private static Utility utility;
@@ -75,9 +78,15 @@ public class ProfessionPro  extends JavaPlugin
 		helpList = new ArrayList<>();
 		argumentMap = new LinkedHashMap<>();
 		
-		yamlHandler = new YamlHandler(this);
+		try
+		{
+			yamlHandler = new YamlHandler(this);
+		} catch (IOException e)
+		{
+			e.printStackTrace();
+		}
 		utility = new Utility(this);
-		if (yamlHandler.get().getBoolean("Mysql.Status", false) == true)
+		if (yamlHandler.getConfig().getBoolean("Mysql.Status", false) == true)
 		{
 			mysqlHandler = new MysqlHandler(this);
 			mysqlSetup = new MysqlSetup(this);
@@ -107,7 +116,7 @@ public class ProfessionPro  extends JavaPlugin
 	{
 		Bukkit.getScheduler().cancelTasks(this);
 		HandlerList.unregisterAll(this);
-		if (yamlHandler.get().getBoolean("Mysql.Status", false) == true)
+		if (yamlHandler.getConfig().getBoolean("Mysql.Status", false) == true)
 		{
 			if (mysqlSetup.getConnection() != null) 
 			{
@@ -346,13 +355,13 @@ public class ProfessionPro  extends JavaPlugin
 		//pm.registerEvents(new PlayerListener(plugin), plugin);
 	}
 	
-	public boolean reload()
+	public boolean reload() throws IOException
 	{
 		if(!yamlHandler.loadYamlHandler())
 		{
 			return false;
 		}
-		if(yamlHandler.get().getBoolean("Mysql.Status", false))
+		if(yamlHandler.getConfig().getBoolean("Mysql.Status", false))
 		{
 			mysqlSetup.closeConnection();
 			if(!mysqlHandler.loadMysqlHandler())
@@ -568,4 +577,14 @@ public class ProfessionPro  extends JavaPlugin
                     + " to system classloader");
         }
     }
+
+	public YamlManager getYamlManager()
+	{
+		return yamlManager;
+	}
+
+	public void setYamlManager(YamlManager yamlManager)
+	{
+		ProfessionPro.yamlManager = yamlManager;
+	}
 }

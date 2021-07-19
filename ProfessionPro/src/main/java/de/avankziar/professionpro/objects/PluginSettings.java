@@ -48,23 +48,23 @@ public class PluginSettings
 	{
 		YamlHandler yh = plugin.getYamlHandler();
 		List<String> list = new ArrayList<>();
-		if(yh.get().get("General.Professions") != null)
+		if(yh.getConfig().get("General.Professions") != null)
 		{
-			list = yh.get().getStringList("General.Professions");
+			list = yh.getConfig().getStringList("General.Professions");
 		}
 		pluginSettings = new PluginSettings(
-				yh.get().getBoolean("Bungee", false),
+				yh.getConfig().getBoolean("Bungee", false),
 				list,
-				yh.get().getBoolean("Player.UpdateJoiningPlayersProfession", false),
-				yh.get().getInt("Player.MaximalProfessionAtOneTime", 1),
-				yh.get().getInt("Player.MaximalUtilityBlocksAtOneTime", 5),
-				yh.get().getLong("Player.MinimalTimeBeforProfessionSwitch", 84600000),
-				yh.get().getBoolean("Player.LooseExpBySwitchingProfession", false),
-				ExpSwitchLooseType.valueOf(yh.get().getString("Player.ExpSwitchLooseType", "FIX")),
-				yh.get().getDouble("Player.ExpLoose.Fix", 1000.0),
-				yh.get().getDouble("Player.ExpLoose.Percantage", 0.1),
-				yh.get().getInt("Player.DistributeMoneySchedulerTimer", 30),
-				yh.get().getInt("Player.DistributeExpSchedulerTimer", 10));
+				yh.getConfig().getBoolean("Player.UpdateJoiningPlayersProfession", false),
+				yh.getConfig().getInt("Player.MaximalProfessionAtOneTime", 1),
+				yh.getConfig().getInt("Player.MaximalUtilityBlocksAtOneTime", 5),
+				yh.getConfig().getLong("Player.MinimalTimeBeforProfessionSwitch", 84600000),
+				yh.getConfig().getBoolean("Player.LooseExpBySwitchingProfession", false),
+				ExpSwitchLooseType.valueOf(yh.getConfig().getString("Player.ExpSwitchLooseType", "FIX")),
+				yh.getConfig().getDouble("Player.ExpLoose.Fix", 1000.0),
+				yh.getConfig().getDouble("Player.ExpLoose.Percantage", 0.1),
+				yh.getConfig().getInt("Player.DistributeMoneySchedulerTimer", 30),
+				yh.getConfig().getInt("Player.DistributeExpSchedulerTimer", 10));
 	}
 	
 	public static PluginSettings get()

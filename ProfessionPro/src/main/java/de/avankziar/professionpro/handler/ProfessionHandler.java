@@ -28,7 +28,7 @@ public class ProfessionHandler
 	
 	public static void init(ProfessionPro plugin)
 	{
-		List<String> professionList = plugin.getYamlHandler().get().getStringList("General.Profession");
+		List<String> professionList = plugin.getYamlHandler().getConfig().getStringList("General.Profession");
 		if(professionList == null)
 		{
 			plugin.getLogger().severe("Can not load the Professionlist in the config.yml!");

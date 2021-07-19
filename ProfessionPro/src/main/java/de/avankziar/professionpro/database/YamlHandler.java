@@ -2,92 +2,43 @@ package main.java.de.avankziar.professionpro.database;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 import org.bukkit.configuration.InvalidConfigurationException;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.craftbukkit.libs.org.apache.commons.io.FileUtils;
 
 import main.java.de.avankziar.professionpro.ProfessionPro;
+import main.java.de.avankziar.professionpro.database.LanguageObject.LanguageType;
 
 public class YamlHandler
 {
 	private ProfessionPro plugin;
 	private File config = null;
 	private YamlConfiguration cfg = new YamlConfiguration();
+	
 	private File commands = null;
 	private YamlConfiguration com = new YamlConfiguration();
-	private File profession = null;
-	private YamlConfiguration pro = new YamlConfiguration();
-	private File arabic = null;
-	private YamlConfiguration ara = new YamlConfiguration();
-	private File dutch = null;
-	private YamlConfiguration dut = new YamlConfiguration();
-	private File english = null;
-	private YamlConfiguration eng = new YamlConfiguration();
-	private File french = null;
-	private YamlConfiguration fre = new YamlConfiguration();
-	private File german = null;
-	private YamlConfiguration ger = new YamlConfiguration();
-	private File hindi = null;
-	private YamlConfiguration hin = new YamlConfiguration();
-	private File italian = null;
-	private YamlConfiguration ita = new YamlConfiguration();
-	private File japanese = null;
-	private YamlConfiguration jap = new YamlConfiguration();
-	private File mandarin = null;
-	private YamlConfiguration mad = new YamlConfiguration();
-	private File russian = null;
-	private YamlConfiguration rus = new YamlConfiguration();
-	private File spanish = null;
-	private YamlConfiguration spa = new YamlConfiguration();
-	private String languages;
-	private YamlConfiguration lang = null;
 	
-	public YamlHandler(ProfessionPro plugin) 
+	private String languages;
+	private File language = null;
+	private YamlConfiguration lang = new YamlConfiguration();
+	
+	private LinkedHashMap<String, YamlConfiguration> professions = new LinkedHashMap<>();
+	private LinkedHashMap<String, YamlConfiguration> items = new LinkedHashMap<>();
+
+	public YamlHandler(ProfessionPro plugin) throws IOException 
 	{
 		this.plugin = plugin;
 		loadYamlHandler();
 	}
 	
-	public boolean loadYamlHandler()
-	{
-		if(!mkdirConfig())
-		{
-			return false;
-		}
-		if(!loadYamlTask(config, cfg, "config.yml"))
-		{
-			return false;
-		}
-		if(!loadYamlTask(commands, com, "commands.yml"))
-		{
-			return false;
-		}
-		if(!loadYamlTask(profession, pro, "profession.yml"))
-		{
-			return false;
-		}
-		languages = cfg.getString("Language", "English");
-		if(!mkdir())
-		{
-			return false;
-		}
-		if(!loadYamls())
-		{
-			return false;
-		}
-		initGetL();
-		return true;
-	}
-	
-	public YamlConfiguration get()
+	public YamlConfiguration getConfig()
 	{
 		return cfg;
-	}
-	
-	public YamlConfiguration getL()
-	{
-		return lang;
 	}
 	
 	public YamlConfiguration getCom()
@@ -95,259 +46,223 @@ public class YamlHandler
 		return com;
 	}
 	
-	public YamlConfiguration getPro()
+	public YamlConfiguration getL()
 	{
-		return pro;
+		return lang;
 	}
 	
-	public void initGetL()
+	public YamlConfiguration getProfessions(String referenceName)
 	{
-		if(languages.equalsIgnoreCase("Arabic"))
-		{
-			lang = ara;
-		} else if(languages.equalsIgnoreCase("Dutch"))
-		{
-			lang = dut;
-		} else if(languages.equalsIgnoreCase("French"))
-		{
-			lang = fre;
-		} else if(languages.equalsIgnoreCase("German"))
-		{
-			lang = ger;
-		} else if(languages.equalsIgnoreCase("Hindi"))
-		{
-			lang = hin;
-		} else if(languages.equalsIgnoreCase("Italian"))
-		{
-			lang = ita;
-		} else if(languages.equalsIgnoreCase("Japanese"))
-		{
-			lang = jap;
-		} else if(languages.equalsIgnoreCase("Mandarin"))
-		{
-			lang = mad;
-		} else if(languages.equalsIgnoreCase("Russian"))
-		{
-			lang = rus;
-		} else if(languages.equalsIgnoreCase("Spanish"))
-		{
-			lang = spa;
-		} else
-		{
-			lang = eng;
-		}
+		return (professions.containsKey(referenceName)) ? professions.get(referenceName) : null;
 	}
 	
-	public boolean mkdirConfig()
+	public YamlConfiguration getItem(String referenceName)
 	{
-		config = new File(plugin.getDataFolder(), "config.yml");
-		if(!config.exists()) 
+		return (items.containsKey(referenceName)) ? items.get(referenceName) : null;
+	}
+	
+	public boolean loadYamlHandler() throws IOException
+	{
+		if(!mkdirStaticFiles())
 		{
-			ProfessionPro.log.info("Create config.yml...");
-			plugin.saveResource("config.yml", false);
+			return false;
 		}
-		commands = new File(plugin.getDataFolder(), "commands.yml");
-		if(!commands.exists()) 
+		
+		if(!mkdirDynamicFiles()) //Per "Thing" per example languages, one file
 		{
-			ProfessionPro.log.info("Create commands.yml...");
-			plugin.saveResource("commands.yml", false);
-		}
-		profession = new File(plugin.getDataFolder(), "profession.yml");
-		if(!profession.exists()) 
-		{
-			ProfessionPro.log.info("Create profession.yml...");
-			plugin.saveResource("profession.yml", false);
+			return false;
 		}
 		return true;
 	}
 	
-	private boolean mkdir()
+	public boolean mkdirStaticFiles() throws IOException
 	{
+		//Erstellen aller Werte FÜR die Config.yml
+		plugin.setYamlManager(new YamlManager());
+		
+		//Initialisierung der config.yml
+		config = new File(plugin.getDataFolder(), "config.yml");
+		if(!config.exists()) 
+		{
+			ProfessionPro.log.info("Create config.yml...");
+			try
+			{
+				//Erstellung einer "leere" config.yml
+				FileUtils.copyToFile(plugin.getResource("default.yml"), config);
+			} catch (IOException e)
+			{
+				e.printStackTrace();
+			}
+		}
+		//Laden der config.yml
+		if(!loadYamlTask(config, cfg, "config.yml"))
+		{
+			return false;
+		}
+		
+		//Niederschreiben aller Werte für die Datei
+		writeFile(config, cfg, plugin.getYamlManager().getConfigKey());
+		
+		languages = cfg.getString("Language", "ENGLISH").toUpperCase();
+		
+		commands = new File(plugin.getDataFolder(), "commands.yml");
+		if(!commands.exists()) 
+		{
+			ProfessionPro.log.info("Create commands.yml...");
+			try
+			{
+				//Erstellung einer "leere" config.yml
+				FileUtils.copyToFile(plugin.getResource("default.yml"), commands);
+			} catch (IOException e)
+			{
+				e.printStackTrace();
+			}
+		}
+		if(!loadYamlTask(commands, com, "commands.yml"))
+		{
+			return false;
+		}
+		writeFile(commands, com, plugin.getYamlManager().getCommandsKey());
+		return true;
+	}
+	
+	private boolean mkdirDynamicFiles() throws IOException
+	{
+		//Vergleich der Sprachen
+		List<LanguageObject.LanguageType> types = new ArrayList<LanguageObject.LanguageType>(EnumSet.allOf(LanguageObject.LanguageType.class));
+		LanguageType languageType = LanguageType.ENGLISH;
+		for(LanguageType type : types)
+		{
+			if(type.toString().equals(languages))
+			{
+				languageType = type;
+				break;
+			}
+		}
+		//Setzen der Sprache
+		plugin.getYamlManager().setLanguageType(languageType);
+		
+		if(!mkdirLanguage())
+		{
+			return false;
+		}
+		
+		if(!mkdirItems())
+		{
+			return false;
+		}
+		
+		if(!mkdirProfessions())
+		{
+			return false;
+		}
+		return true;
+	}
+	
+	private boolean mkdirLanguage() throws IOException
+	{
+		String languageString = plugin.getYamlManager().getLanguageType().toString().toLowerCase();
 		File directory = new File(plugin.getDataFolder()+"/Languages/");
 		if(!directory.exists())
 		{
 			directory.mkdir();
 		}
-		arabic = new File(directory.getPath(), "arabic.yml");
-		if(!arabic.exists()) 
+		language = new File(directory.getPath(), languageString+".yml");
+		if(!language.exists()) 
 		{
-			ProfessionPro.log.info("Create arabic.yml...");
+			ProfessionPro.log.info("Create %lang%.yml...".replace("%lang%", languageString));
 			try
 			{
-				FileUtils.copyToFile(plugin.getResource("arabic.yml"), arabic);
+				FileUtils.copyToFile(plugin.getResource("default.yml"), language);
 			} catch (IOException e)
 			{
 				e.printStackTrace();
 			}
 		}
-		dutch = new File(directory.getPath(), "dutch.yml");
-		if(!dutch.exists()) 
+		//Laden der Datei
+		if(!loadYamlTask(language, lang, languageString+".yml"))
 		{
-			ProfessionPro.log.info("Create dutch.yml...");
-			try
-			{
-				FileUtils.copyToFile(plugin.getResource("dutch.yml"), dutch);
-			} catch (IOException e)
-			{
-				e.printStackTrace();
-			}
+			return false;
 		}
-		english = new File(directory.getPath(), "english.yml");
-		if(!english.exists()) 
+		//Niederschreiben aller Werte in die Datei
+		writeFile(language, lang, plugin.getYamlManager().getLanguageKey());
+		return true;
+	}
+	
+	private boolean mkdirItems() throws IOException
+	{
+		File directory = new File(plugin.getDataFolder()+"/CustomItems/");
+		if(!directory.exists())
 		{
-			ProfessionPro.log.info("Create english.yml...");
-			try
-			{
-				FileUtils.copyToFile(plugin.getResource("english.yml"), english);
-			} catch (IOException e)
-			{
-				e.printStackTrace();
-			}
+			directory.mkdir();
 		}
-		french = new File(directory.getPath(), "french.yml");
-		if(!french.exists())
+		List<String> referenceList = cfg.getStringList("EnabledItems");
+		if(referenceList.isEmpty())
 		{
-			ProfessionPro.log.info("Create french.yml...");
-			try
-			{
-				FileUtils.copyToFile(plugin.getResource("french.yml"), french);
-			} catch (IOException e)
-			{
-				e.printStackTrace();
-			}
+			return true;
 		}
-		german = new File(directory.getPath(), "german.yml");
-		if(!german.exists()) 
+		for(String referenceName : referenceList)
 		{
-			ProfessionPro.log.info("Create german.yml...");
-			try
+			File item = new File(directory.getPath(), referenceName+".yml");
+			if(!item.exists()) 
 			{
-				FileUtils.copyToFile(plugin.getResource("german.yml"), german);
-			} catch (IOException e)
-			{
-				e.printStackTrace();
+				ProfessionPro.log.info("Create %item%.yml...".replace("%item%", referenceName));
+				try
+				{
+					FileUtils.copyToFile(plugin.getResource("default.yml"), item);
+				} catch (IOException e)
+				{
+					e.printStackTrace();
+				}
 			}
-		}
-		hindi = new File(directory.getPath(), "hindi.yml");
-		if(!hindi.exists()) 
-		{
-			ProfessionPro.log.info("Create hindi.yml...");
-			try
+			YamlConfiguration itm = new YamlConfiguration();
+			//Laden der Datei
+			if(!loadYamlTask(item, itm, referenceName+".yml"))
 			{
-				FileUtils.copyToFile(plugin.getResource("hindi.yml"), hindi);
-			} catch (IOException e)
-			{
-				e.printStackTrace();
+				return false;
 			}
-		}
-		italian = new File(directory.getPath(), "italian.yml");
-		if(!italian.exists()) 
-		{
-			ProfessionPro.log.info("Create italian.yml...");
-			try
-			{
-				FileUtils.copyToFile(plugin.getResource("italian.yml"), italian);
-			} catch (IOException e)
-			{
-				e.printStackTrace();
-			}
-		}
-		japanese = new File(directory.getPath(), "japanese.yml");
-		if(!japanese.exists()) 
-		{
-			ProfessionPro.log.info("Create japanese.yml...");
-			try
-			{
-				FileUtils.copyToFile(plugin.getResource("japanese.yml"), japanese);
-			} catch (IOException e)
-			{
-				e.printStackTrace();
-			}
-		}
-		mandarin = new File(directory.getPath(), "mandarin.yml");
-		if(!mandarin.exists()) 
-		{
-			ProfessionPro.log.info("Create mandarin.yml...");
-			try
-			{
-				FileUtils.copyToFile(plugin.getResource("mandarin.yml"), mandarin);
-			} catch (IOException e)
-			{
-				e.printStackTrace();
-			}
-		}
-		russian = new File(directory.getPath(), "russian.yml");
-		if(!russian.exists()) 
-		{
-			ProfessionPro.log.info("Create russian.yml...");
-			try
-			{
-				FileUtils.copyToFile(plugin.getResource("russian.yml"), russian);
-			} catch (IOException e)
-			{
-				e.printStackTrace();
-			}
-		}
-		spanish = new File(directory.getPath(), "spanish.yml");
-		if(!spanish.exists()) 
-		{
-			ProfessionPro.log.info("Create spanish.yml...");
-			try
-			{
-				FileUtils.copyToFile(plugin.getResource("spanish.yml"), spanish);
-			} catch (IOException e)
-			{
-				e.printStackTrace();
-			}
+			//Niederschreiben aller Werte in die Datei
+			writeFile(item, itm, plugin.getYamlManager().getItemKeys());
+			items.put(referenceName, itm);
 		}
 		return true;
 	}
 	
-	public boolean loadYamls()
+	private boolean mkdirProfessions() throws IOException
 	{
-		if(!loadYamlTask(arabic, ara, "arabic.yml"))
+		File directory = new File(plugin.getDataFolder()+"/Professions/");
+		if(!directory.exists())
 		{
-			return false;
+			directory.mkdir();
 		}
-		if(!loadYamlTask(dutch, dut, "dutch.yml"))
+		List<String> referenceList = cfg.getStringList("EnabledProfessions");
+		if(referenceList.isEmpty())
 		{
-			return false;
+			return true;
 		}
-		if(!loadYamlTask(english, eng, "english.yml"))
+		for(String referenceName : referenceList)
 		{
-			return false;
-		}
-		if(!loadYamlTask(french, fre, "french.yml"))
-		{
-			return false;
-		}
-		if(!loadYamlTask(german, ger, "german.yml"))
-		{
-			return false;
-		}
-		if(!loadYamlTask(hindi, hin, "hindi.yml"))
-		{
-			return false;
-		}
-		if(!loadYamlTask(italian, ita, "italian.yml"))
-		{
-			return false;
-		}
-		if(!loadYamlTask(japanese, jap, "japanese.yml"))
-		{
-			return false;
-		}
-		if(!loadYamlTask(mandarin, mad, "mandarin.yml"))
-		{
-			return false;
-		}
-		if(!loadYamlTask(russian, rus, "russian.yml"))
-		{
-			return false;
-		}
-		if(!loadYamlTask(spanish, spa, "spanish.yml"))
-		{
-			return false;
+			File profession = new File(directory.getPath(), referenceName+".yml");
+			if(!profession.exists()) 
+			{
+				ProfessionPro.log.info("Create %prof%.yml...".replace("%prof%", referenceName));
+				try
+				{
+					FileUtils.copyToFile(plugin.getResource("default.yml"), profession);
+				} catch (IOException e)
+				{
+					e.printStackTrace();
+				}
+			}
+			YamlConfiguration pfs = new YamlConfiguration();
+			//Laden der Datei
+			if(!loadYamlTask(profession, pfs, referenceName+".yml"))
+			{
+				return false;
+			}
+			//Niederschreiben aller Werte in die Datei
+			writeFile(profession, pfs, plugin.getYamlManager().getProfessionKeys());
+			professions.put(referenceName, pfs);
 		}
 		return true;
 	}
@@ -365,6 +280,23 @@ public class YamlHandler
 			e.printStackTrace();
 			return false;
 		}
+		return true;
+	}
+	
+	private boolean writeFile(File file, YamlConfiguration yml, LinkedHashMap<String, LanguageObject> keyMap) throws IOException
+	{
+		for(String key : keyMap.keySet())
+		{
+			LanguageObject languageObject = keyMap.get(key);
+			if(languageObject.languageValues.containsKey(plugin.getYamlManager().getLanguageType()) == true)
+			{
+				plugin.getYamlManager().setFileInput(yml, keyMap, key, plugin.getYamlManager().getLanguageType());
+			} else if(languageObject.languageValues.containsKey(plugin.getYamlManager().getDefaultLanguageType()) == true)
+			{
+				plugin.getYamlManager().setFileInput(yml, keyMap, key, plugin.getYamlManager().getDefaultLanguageType());
+			}
+		}
+		yml.save(file);
 		return true;
 	}
 }

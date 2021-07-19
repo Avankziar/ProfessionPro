@@ -6,15 +6,20 @@ public class Level
 	private boolean endLevel;
 	private double actualExp;
 	private double endExp;
-	private double perLevelExpMultiplicator;
+	
 	private double perLevelMoneyMultiplicator;
+	private double perLevelProfessionMultiplicator;
 	private double perLevelItemMultiplicator;
+	private double perLevelExpMultiplicator;
 	
 	public Level(){}
 	
 	public Level(int level, boolean endLevel,
 			double actualExp, double endExp,
-			double perLevelExpMultiplicator, double perLevelMoneyMultiplicator, double perLevelItemMultiplicator)
+			double perLevelMoneyMultiplicator,
+			double perLevelProfessionExpMultiplicator,
+			double perLevelItemMultiplicator,
+			double perLevelExpMultiplicator)
 	{
 		setLevel(level);
 		setEndLevel(endLevel);
@@ -23,6 +28,7 @@ public class Level
 		setPerLevelExpMultiplicator(perLevelExpMultiplicator);
 		setPerLevelMoneyMultiplicator(perLevelMoneyMultiplicator);
 		setPerLevelItemMultiplicator(perLevelItemMultiplicator);
+		setPerLevelProfessionMultiplicator(perLevelProfessionExpMultiplicator);
 	}
 
 	public int getLevel()
@@ -93,5 +99,15 @@ public class Level
 	public void setPerLevelItemMultiplicator(double perLevelItemMultiplicator)
 	{
 		this.perLevelItemMultiplicator = perLevelItemMultiplicator;
+	}
+
+	public double getPerLevelProfessionMultiplicator()
+	{
+		return perLevelProfessionMultiplicator;
+	}
+
+	public void setPerLevelProfessionMultiplicator(double perLevelProfessionMultiplicator)
+	{
+		this.perLevelProfessionMultiplicator = perLevelProfessionMultiplicator;
 	}
 }

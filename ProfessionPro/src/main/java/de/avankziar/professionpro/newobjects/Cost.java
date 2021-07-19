@@ -19,9 +19,9 @@ import main.java.de.avankziar.professionpro.ProfessionPro;
 public class Cost
 {
 	//All "normal" Items as cost
-	LinkedHashMap<Material, Integer> materials = new LinkedHashMap<>();
+	private LinkedHashMap<Material, Integer> materials = new LinkedHashMap<>();
 	//All special Items as cost
-	LinkedHashMap<ItemStack, Integer> items = new LinkedHashMap<>();
+	private LinkedHashMap<ItemStack, Integer> items = new LinkedHashMap<>();
 	//Money cost
 	private double money = 0.0;
 	
@@ -271,5 +271,59 @@ public class Cost
 		enchantments.add(Enchantment.THORNS);
 		enchantments.add(Enchantment.VANISHING_CURSE);
 		enchantments.add(Enchantment.WATER_WORKER);
+	}
+
+	public LinkedHashMap<Material, Integer> getMaterials()
+	{
+		return materials;
+	}
+
+	public void setMaterials(LinkedHashMap<Material, Integer> materials)
+	{
+		this.materials = materials;
+	}
+	
+	public void addMaterial(Material material, Integer amount)
+	{
+		if(materials.containsKey(material))
+		{
+			materials.replace(material, amount);
+		} else
+		{
+			materials.put(material, amount);
+		}
+	}
+
+	public LinkedHashMap<ItemStack, Integer> getItems()
+	{
+		return items;
+	}
+
+	public void setItems(LinkedHashMap<ItemStack, Integer> items)
+	{
+		this.items = items;
+	}
+	
+	public void addItems(ItemStack itemStack, Integer amount)
+	{
+		for(ItemStack is : items.keySet())
+		{
+			if(isSimilar(is, itemStack))
+			{
+				items.replace(itemStack, amount);
+				return;
+			}
+		}
+		items.put(itemStack, amount);
+	}
+
+	public double getMoney()
+	{
+		return money;
+	}
+
+	public void setMoney(double money)
+	{
+		this.money = money;
 	}
 }

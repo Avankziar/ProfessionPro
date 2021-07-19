@@ -5,7 +5,9 @@ import java.util.LinkedHashMap;
 
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.permissions.PermissionAttachmentInfo;
 
+import main.java.de.avankziar.professionpro.newobjects.enums.ListType;
 import main.java.de.avankziar.professionpro.newobjects.enums.PaymentType;
 
 public class BasicProfession
@@ -17,22 +19,17 @@ public class BasicProfession
 	private String displayName;
 	//Permission to access the profession
 	//<perm>.<referenceName>
-	private static String requiredPermissionToAccess;
+	private static String requiredPermissionToAccess = "ppro.access";
 	//Maximum active Professionamount per User/player
 	//<Perm>.<Number>
-	private static String maximumActiveProfessionAmountPerUserPermission;
+	private static String maximumActiveProfessionAmountPerUserPermission = "ppro.maximumactiveprofession";
 	//Maximum Number to evaluate the number for the user, by counting down
-	private static Integer internMaximumNumberForMaximumActiveProfessionAmountPerUserPermission;
+	private static Integer internMaximumNumberForMaximumActiveProfessionAmountPerUserPermission = 50;
 	//Maximum inactive Professionamount per User/player
 	//<Perm>.<Number>
-	private static String maximumInactiveProfessionAmountPerUserPermission;
+	private static String maximumInactiveProfessionAmountPerUserPermission = "ppro.maximuminactiveprofession";
 	//Maximum Number to evaluate the number for the user, by counting down
-	private static Integer internMaximumNumberForMaximumInactiveProfessionAmountPerUserPermission;
-	//Global Multiplicator for all Professions
-	//<Perm>.[money/professionexp/item/vanillaexp].<Number>
-	private static String globalProfessionPaymentMultiplicatorPermission;
-	//Maximum Number to evaluate the number for the user, by counting down
-	private static Integer internMaximumNumberForGlobalProfessionPaymentMultiplicator;
+	private static Integer internMaximumNumberForMaximumInactiveProfessionAmountPerUserPermission = 50;
 	//Perm for useable (Furnace, Brewstand etc)
 	//<Perm>.<Material>.<Number>
 	private static String maximumUseableBlocksPermission;
@@ -40,6 +37,22 @@ public class BasicProfession
 	private static LinkedHashMap<Material, Integer> internMaximumNumberForMaximumUseableBlocksPermission;
 	//All loaded mysql per profession function booster, as list, than it can multiple booster per type
 	private static ArrayList<Booster> globalBoosters = new ArrayList<>();
+	//Global Multiplicator for all Professions
+	//<Perm>.[money/professionexp/item/vanillaexp].<Number>
+	private static String globalProfessionPaymentMultiplicatorPermission = "ppro.multiplicator.global";
+	//Maximum Number to evaluate the number for the user, by counting down
+	//TODO maybe not in use
+	private static Double internMaximumNumberForGlobalProfessionPaymentMultiplicator = 5.0;
+	//Global Multiplicator for all Professions
+	//<Perm>.<Profession>.[money/professionexp/item/vanillaexp].<Number>
+	private static String professionPaymentMultiplicatorPermission = "ppro.multiplicator.profession";
+	//Maximum Number to evaluate the number for the user, by counting down
+	//TODO maybe not in use
+	private static Double internMaximumNumberForProfessionPaymentMultiplicator = 5.0;
+	//Set the listtype, if the item isnt listed in the profession
+	private static ListType generalCraftableType = ListType.WHITELIST;
+	//Set the listtype, if the block isnt listed in the profession to interact
+	private static ListType generalInteractType = ListType.WHITELIST;
 	
 	public BasicProfession()
 	{
@@ -138,22 +151,11 @@ public class BasicProfession
 	
 	public static int getMaximumActiveProfessionAmount(Player player)
 	{
-		if(player.hasPermission("*")
-				|| player.hasPermission(BasicProfession.maximumActiveProfessionAmountPerUserPermission+".*")
-				|| player.isOp())
-		{
-			return Integer.MAX_VALUE;
-		}
-		for(int i = (BasicProfession.internMaximumNumberForMaximumActiveProfessionAmountPerUserPermission != null) 
-				? BasicProfession.internMaximumNumberForMaximumActiveProfessionAmountPerUserPermission : 0;
-				i > 0; i--)
-		{
-			if(player.hasPermission(BasicProfession.maximumActiveProfessionAmountPerUserPermission+"."+i))
-			{
-				return i;
-			}
-		}
-		return 0;
+		return getIntegerPermissionCheck(
+				player, 
+				BasicProfession.maximumActiveProfessionAmountPerUserPermission, 
+				0,
+				BasicProfession.internMaximumNumberForMaximumActiveProfessionAmountPerUserPermission);
 	}
 	
 	public static String getMaximumInactiveProfessionAmountPerUserPermission()
@@ -197,22 +199,11 @@ public class BasicProfession
 	
 	public static int getMaximumInactiveProfessionAmount(Player player)
 	{
-		if(player.hasPermission("*")
-				|| player.hasPermission(BasicProfession.maximumInactiveProfessionAmountPerUserPermission+".*")
-				|| player.isOp())
-		{
-			return Integer.MAX_VALUE;
-		}
-		for(int i = (BasicProfession.internMaximumNumberForMaximumInactiveProfessionAmountPerUserPermission != null) 
-				? BasicProfession.internMaximumNumberForMaximumInactiveProfessionAmountPerUserPermission : 0;
-				i > 0; i--)
-		{
-			if(player.hasPermission(BasicProfession.maximumInactiveProfessionAmountPerUserPermission+"."+i))
-			{
-				return i;
-			}
-		}
-		return 0;
+		return getIntegerPermissionCheck(
+				player, 
+				BasicProfession.maximumInactiveProfessionAmountPerUserPermission,
+				0,
+				BasicProfession.internMaximumNumberForMaximumInactiveProfessionAmountPerUserPermission);
 	}
 	
 	public static String getGlobalProfessionPaymentMultiplicator()
@@ -234,13 +225,13 @@ public class BasicProfession
 		BasicProfession.globalProfessionPaymentMultiplicatorPermission = null;
 	}
 
-	public static Integer getInternMaximumNumberForGlobalProfessionPaymentMultiplicator()
+	public static Double getInternMaximumNumberForGlobalProfessionPaymentMultiplicator()
 	{
 		return internMaximumNumberForGlobalProfessionPaymentMultiplicator;
 	}
 
 	public static void setInternMaximumNumberForGlobalProfessionPaymentMultiplicator(
-			Integer internMaximumNumberForGlobalProfessionPaymentMultiplicator)
+			Double internMaximumNumberForGlobalProfessionPaymentMultiplicator)
 	{
 		if(BasicProfession.internMaximumNumberForGlobalProfessionPaymentMultiplicator != null)
 		{
@@ -254,18 +245,13 @@ public class BasicProfession
 		BasicProfession.internMaximumNumberForGlobalProfessionPaymentMultiplicator = null;
 	}
 	
-	public static int getGlobalPaymentMultiplicator(Player player, PaymentType paymentType)
+	public static double getGlobalPaymentMultiplicator(Player player, PaymentType paymentType)
 	{
-		for(int i = (BasicProfession.internMaximumNumberForGlobalProfessionPaymentMultiplicator != null) 
-				? BasicProfession.internMaximumNumberForGlobalProfessionPaymentMultiplicator : 0;
-				i > 0; i--)
-		{
-			if(player.hasPermission(BasicProfession.globalProfessionPaymentMultiplicatorPermission+"."+paymentType.toString().toLowerCase()+"."+i))
-			{
-				return i;
-			}
-		}
-		return 0;
+		return getDoublePermissionCheck(
+				player, 
+				BasicProfession.globalProfessionPaymentMultiplicatorPermission,
+				1.0,
+				paymentType.toString().toLowerCase());
 	}
 
 	public static String getMaximumUseableBlocksPermission()
@@ -334,5 +320,138 @@ public class BasicProfession
 	public static void addGlobalBooster(Booster globalBooster)
 	{
 		BasicProfession.globalBoosters.add(globalBooster);
+	}
+	
+	public static String getProfessionPaymentMultiplicator()
+	{
+		return professionPaymentMultiplicatorPermission;
+	}
+
+	public static void setProfessionPaymentMultiplicator(String professionPaymentMultiplicator)
+	{
+		if(BasicProfession.professionPaymentMultiplicatorPermission != null)
+		{
+			return;
+		}
+		BasicProfession.professionPaymentMultiplicatorPermission = professionPaymentMultiplicator;
+	}
+	
+	public static void resetProfessionPaymentMultiplicator()
+	{
+		BasicProfession.professionPaymentMultiplicatorPermission = null;
+	}
+
+	public static Double getInternMaximumNumberForProfessionPaymentMultiplicator()
+	{
+		return internMaximumNumberForProfessionPaymentMultiplicator;
+	}
+
+	public static void setInternMaximumNumberForProfessionPaymentMultiplicator(
+			Double internMaximumNumberForProfessionPaymentMultiplicator)
+	{
+		if(BasicProfession.internMaximumNumberForProfessionPaymentMultiplicator != null)
+		{
+			return;
+		}
+		BasicProfession.internMaximumNumberForProfessionPaymentMultiplicator = internMaximumNumberForProfessionPaymentMultiplicator;
+	}
+	
+	public static void resetInternMaximumNumberForProfessionPaymentMultiplicator()
+	{
+		BasicProfession.internMaximumNumberForProfessionPaymentMultiplicator = null;
+	}
+	
+	public static double getPaymentMultiplicator(Player player, String referenceName, PaymentType paymentType)
+	{
+		return getDoublePermissionCheck(
+				player,
+				BasicProfession.professionPaymentMultiplicatorPermission,
+				1.0,
+				referenceName, paymentType.toString().toLowerCase());
+	}
+
+	public static ListType getGeneralCraftableType()
+	{
+		return generalCraftableType;
+	}
+
+	public static void setGeneralCraftableType(ListType generalCraftableType)
+	{
+		BasicProfession.generalCraftableType = generalCraftableType;
+	}
+
+	public static ListType getGeneralInteractType()
+	{
+		return generalInteractType;
+	}
+
+	public static void setGeneralInteractType(ListType generalInteractType)
+	{
+		BasicProfession.generalInteractType = generalInteractType;
+	}
+	
+	public static double getDoublePermissionCheck(
+			Player player, String basicPermission, double minimalReturnValue, String...values)
+	{
+		String perm = basicPermission;
+		for(String s : values)
+		{
+			perm += "."+s;
+		}
+		if(player.hasPermission("*")
+				|| player.hasPermission(perm+".*")
+				|| player.isOp())
+		{
+			return Double.MAX_VALUE;
+		}
+		for(PermissionAttachmentInfo permai : player.getEffectivePermissions())
+		{
+			if(permai.getPermission().startsWith(perm))
+			{
+				if(permai.getValue())
+				{
+					String s = permai.getPermission().substring(perm.length()+1);
+					double value = 0.0;
+					try
+					{
+						value = Double.parseDouble(s);
+						return value;
+					} catch(NumberFormatException e)
+					{
+						return minimalReturnValue;
+					}
+				} else
+				{
+					return minimalReturnValue;
+				}
+			}
+		}
+		return minimalReturnValue;
+	}
+	
+	public static int getIntegerPermissionCheck(
+			Player player, String basicPermission, Integer maxNumber,
+			int minimalReturnValue, String... values)
+	{
+		String perm = basicPermission;
+		for(String s : values)
+		{
+			perm += "."+s;
+		}
+		if(player.hasPermission("*")
+				|| player.hasPermission(perm+".*")
+				|| player.isOp())
+		{
+			return Integer.MAX_VALUE;
+		}
+		for(int i = (maxNumber != null) ? maxNumber: 0;
+				i > 0; i--)
+		{
+			if(player.hasPermission(perm+"."+i))
+			{
+				return i;
+			}
+		}
+		return minimalReturnValue;
 	}
 }
